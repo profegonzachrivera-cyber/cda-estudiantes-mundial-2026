@@ -22,32 +22,26 @@ export default function Home() {
       <Image
         src="/logo-cdae.jpg"
         alt="CDA Estudiantes de Calbuco"
-        width={220}
-        height={220}
-        className="mb-6 mt-2"
+        width={210}
+        height={210}
+        className="mb-6 mt-2 rounded-lg"
       />
 
-      <h1 className="text-5xl font-bold text-center mb-4">
+      <h1 className="text-5xl font-bold text-center mb-6">
         ⚽ CDA Estudiantes Mundial 2026
       </h1>
 
-      <p className="text-yellow-400 font-bold text-lg text-center mb-4">
+      <Image
+        src="/logo-mundial-2026.png"
+        alt="Logo Mundial FIFA 2026"
+        width={230}
+        height={160}
+        className="mb-6"
+      />
+
+      <p className="text-yellow-400 font-bold text-lg text-center mb-6">
         🏆 {isSpanish ? "Premios hasta" : "Prizes up to"} €150 / $150.000 CLP
       </p>
-
-      <div className="flex flex-col items-center mb-8">
-        <div className="flex gap-6 text-6xl mb-2">
-          <span>🇺🇸</span>
-          <span>🇨🇦</span>
-          <span>🇲🇽</span>
-        </div>
-
-        <p className="text-slate-300 text-sm">
-          {isSpanish
-            ? "Países anfitriones del Mundial FIFA 2026"
-            : "Host countries of the FIFA World Cup 2026"}
-        </p>
-      </div>
 
       <p className="text-xl text-center max-w-3xl mb-8">
         {isSpanish
@@ -71,9 +65,21 @@ export default function Home() {
         </h2>
 
         <ul className="space-y-2 mb-6">
-          <li>✅ {isSpanish ? "Resultado exacto = 5 puntos" : "Exact score = 5 points"}</li>
-          <li>✅ {isSpanish ? "Ganador o empate correcto = 3 puntos" : "Correct winner or draw = 3 points"}</li>
-          <li>✅ {isSpanish ? "Invita a 2 participantes = +25 puntos" : "Invite 2 participants = +25 points"}</li>
+          <li>
+            ✅ {isSpanish ? "Resultado exacto = 5 puntos" : "Exact score = 5 points"}
+          </li>
+          <li>
+            ✅{" "}
+            {isSpanish
+              ? "Ganador o empate correcto = 3 puntos"
+              : "Correct winner or draw = 3 points"}
+          </li>
+          <li>
+            ✅{" "}
+            {isSpanish
+              ? "Invita a 2 participantes = +25 puntos"
+              : "Invite 2 participants = +25 points"}
+          </li>
         </ul>
 
         <h2 className="text-2xl font-bold mb-4">
@@ -96,37 +102,44 @@ export default function Home() {
 
         <ul className="space-y-2 mb-8">
           <li>
-            • {isSpanish
+            •{" "}
+            {isSpanish
               ? "Cada participante puede registrar una sola cuenta."
               : "Each participant may register only one account."}
           </li>
           <li>
-            • {isSpanish
+            •{" "}
+            {isSpanish
               ? "El pago debe estar confirmado para participar."
               : "Payment must be confirmed in order to participate."}
           </li>
           <li>
-            • {isSpanish
+            •{" "}
+            {isSpanish
               ? "Los pronósticos para cada fase deberán registrarse antes de una hora del inicio de dicha fase. Una vez cerrada la fase, no se podrán realizar modificaciones."
               : "Predictions for each stage must be submitted at least one hour before that stage begins. Once the stage is closed, predictions cannot be modified."}
           </li>
           <li>
-            • {isSpanish
+            •{" "}
+            {isSpanish
               ? "El ranking se actualizará al finalizar cada fecha de la Fase de Grupos y posteriormente al término de cada ronda eliminatoria: Dieciseisavos de Final, Octavos de Final, Cuartos de Final, Semifinales y Final."
               : "The ranking will be updated after each matchday of the Group Stage and then after each knockout round: Round of 32, Round of 16, Quarter-finals, Semi-finals and Final."}
           </li>
           <li>
-            • {isSpanish
+            •{" "}
+            {isSpanish
               ? "En caso de empate en la clasificación final, se utilizará el número de resultados exactos acertados como criterio de desempate."
               : "In case of a tie in the final ranking, the number of exact scores predicted correctly will be used as the tiebreaker."}
           </li>
           <li>
-            • {isSpanish
+            •{" "}
+            {isSpanish
               ? "La participación implica la aceptación de todas las reglas del concurso."
               : "Participation implies acceptance of all contest rules."}
           </li>
           <li>
-            • {isSpanish
+            •{" "}
+            {isSpanish
               ? "La organización resolverá cualquier situación no contemplada en las reglas."
               : "The organization will resolve any situation not covered by these rules."}
           </li>
@@ -137,11 +150,31 @@ export default function Home() {
         </h2>
 
         <ol className="space-y-2 mb-8 list-decimal list-inside">
-          <li>{isSpanish ? "Inscríbete realizando el pago correspondiente." : "Register by completing the required payment."}</li>
-          <li>{isSpanish ? "Registra tus pronósticos antes del cierre de cada fase." : "Submit your predictions before each stage closes."}</li>
-          <li>{isSpanish ? "Acumula puntos acertando resultados o ganadores." : "Earn points by predicting exact scores or winners."}</li>
-          <li>{isSpanish ? "Sigue el ranking oficial durante todo el Mundial." : "Follow the official ranking throughout the World Cup."}</li>
-          <li>{isSpanish ? "Compite por los premios finales." : "Compete for the final prizes."}</li>
+          <li>
+            {isSpanish
+              ? "Inscríbete realizando el pago correspondiente."
+              : "Register by completing the required payment."}
+          </li>
+          <li>
+            {isSpanish
+              ? "Registra tus pronósticos antes del cierre de cada fase."
+              : "Submit your predictions before each stage closes."}
+          </li>
+          <li>
+            {isSpanish
+              ? "Acumula puntos acertando resultados o ganadores."
+              : "Earn points by predicting exact scores or winners."}
+          </li>
+          <li>
+            {isSpanish
+              ? "Sigue el ranking oficial durante todo el Mundial."
+              : "Follow the official ranking throughout the World Cup."}
+          </li>
+          <li>
+            {isSpanish
+              ? "Compite por los premios finales."
+              : "Compete for the final prizes."}
+          </li>
         </ol>
 
         <div className="flex flex-col md:flex-row gap-4">
