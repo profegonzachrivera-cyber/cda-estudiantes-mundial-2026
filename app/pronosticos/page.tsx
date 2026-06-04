@@ -227,13 +227,11 @@ const savePredictions = async () => {
     return;
   }
 
-  const rows = matches
+const rows = currentMatches
     .filter(
       (match) =>
         predictions[match.id]?.home !== undefined &&
-        predictions[match.id]?.away !== undefined &&
-        predictions[match.id]?.home !== "" &&
-        predictions[match.id]?.away !== ""
+predictions[match.id]?.away !== undefined
     )
     .map((match) => ({
       nombre: participant.nombre,
@@ -259,7 +257,17 @@ const savePredictions = async () => {
     );
     return;
   }
+if (rows.length < currentMatches.length) {
+  const confirmSave = window.confirm(
+    isSpanish
+      ? `Solo completaste ${rows.length} de ${currentMatches.length} partidos. ¿Quieres guardar igual?`
+      : `You completed only ${rows.length} of ${currentMatches.length} matches. Do you want to save anyway?`
+  );
 
+  if (!confirmSave) {
+    return;
+  }
+}
   setSaving(true);
 
   const { error } = await supabase.from("pronosticos").insert(rows);
@@ -276,11 +284,11 @@ const savePredictions = async () => {
     return;
   }
 
-  setMessage(
-    isSpanish
-      ? "✅ Pronósticos guardados correctamente."
-      : "✅ Predictions saved successfully."
-  );
+ setMessage(
+  isSpanish
+    ? `✅ Se guardaron ${rows.length} pronósticos correctamente.`
+    : `✅ ${rows.length} predictions saved successfully.`
+);
 };
   return (
     <main className="min-h-screen bg-[#07111f] text-white px-6 py-10">
@@ -448,7 +456,7 @@ const savePredictions = async () => {
                     type="number"
                     min="0"
                     disabled={locked}
-                    value={predictions[match.id]?.home || ""}
+                    value={predictions[match.id]?.home ?? ""}
 onChange={(e) => handlePredictionChange(match.id, "home", e.target.value)}
                     className="p-3 rounded-xl bg-white text-black text-center font-bold disabled:bg-slate-500"
                     placeholder="0"
@@ -460,7 +468,7 @@ onChange={(e) => handlePredictionChange(match.id, "home", e.target.value)}
                     type="number"
                     min="0"
                     disabled={locked}
-                    value={predictions[match.id]?.away || ""}
+                    value={predictions[match.id]?.away ?? ""}
 onChange={(e) => handlePredictionChange(match.id, "away", e.target.value)}
                     className="p-3 rounded-xl bg-white text-black text-center font-bold disabled:bg-slate-500"
                     placeholder="0"
