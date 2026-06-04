@@ -228,11 +228,15 @@ const savePredictions = async () => {
   }
 
 const rows = currentMatches
-    .filter(
-      (match) =>
-        predictions[match.id]?.home !== undefined &&
-predictions[match.id]?.away !== undefined
-    )
+  .filter((match) => {
+  const prediction = predictions[match.id];
+
+  return (
+    prediction &&
+    Object.prototype.hasOwnProperty.call(prediction, "home") &&
+    Object.prototype.hasOwnProperty.call(prediction, "away")
+  );
+})
     .map((match) => ({
       nombre: participant.nombre,
       email: participant.email,
