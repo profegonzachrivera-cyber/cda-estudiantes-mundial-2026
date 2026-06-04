@@ -6,6 +6,7 @@ export default function RankingInstagramPage() {
   const ranking = Array.from({ length: 50 }, (_, index) => ({
     position: index + 1,
     name: "Próximamente",
+    flag: "🌍",
     points: 0,
   }));
 
@@ -18,21 +19,19 @@ export default function RankingInstagramPage() {
     page * playersPerPage + playersPerPage
   );
 
+  const medal = (position: number) => {
+    if (position === 1) return "🥇";
+    if (position === 2) return "🥈";
+    if (position === 3) return "🥉";
+    return `#${position}`;
+  };
+
   return (
     <main className="min-h-screen bg-[#07111f] text-white px-6 py-10 flex flex-col items-center">
       <section className="w-[1080px] max-w-full bg-gradient-to-b from-[#07111f] to-[#12325a] rounded-3xl p-10 shadow-2xl border border-blue-400">
         <div className="flex justify-center items-center gap-8 mb-8">
-          <img
-            src="/logo-cdae.jpg"
-            alt="CDAE"
-            className="h-32 rounded-xl bg-white"
-          />
-
-          <img
-            src="/logo-mundial-2026.jpg"
-            alt="Mundial 2026"
-            className="h-32 rounded-xl bg-white p-3"
-          />
+          <img src="/logo-cdae.jpg" alt="CDAE" className="h-32 rounded-xl bg-white" />
+          <img src="/logo-mundial-2026.jpg" alt="Mundial 2026" className="h-32 rounded-xl bg-white p-3" />
         </div>
 
         <h1 className="text-6xl font-extrabold text-center mb-3">
@@ -52,17 +51,14 @@ export default function RankingInstagramPage() {
           {currentPlayers.map((player) => (
             <div
               key={player.position}
-              className="grid grid-cols-[90px_1fr_130px] items-center border-b border-slate-700 py-5 text-3xl"
+              className="grid grid-cols-[100px_1fr_80px_130px] items-center border-b border-slate-700 py-5 text-3xl"
             >
               <div className="font-extrabold text-yellow-400">
-                #{player.position}
+                {medal(player.position)}
               </div>
-
               <div className="font-bold">{player.name}</div>
-
-              <div className="text-right font-extrabold">
-                {player.points} pts
-              </div>
+              <div className="text-center text-4xl">{player.flag}</div>
+              <div className="text-right font-extrabold">{player.points} pts</div>
             </div>
           ))}
         </div>
@@ -71,7 +67,6 @@ export default function RankingInstagramPage() {
           <p className="text-2xl font-bold">
             ⚽ Predice, suma puntos y compite por premios
           </p>
-
           <p className="text-yellow-400 text-xl mt-2">
             cda-estudiantes-mundial-2026.vercel.app
           </p>

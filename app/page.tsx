@@ -15,11 +15,11 @@ export default function Home() {
   const isSpanish = language === "es";
 
   useEffect(() => {
-    const registrationDeadline = new Date("2026-06-11T14:00:00-04:00");
+    const deadline = new Date("2026-06-11T14:00:00-04:00");
 
     const updateCountdown = () => {
       const now = new Date();
-      const difference = registrationDeadline.getTime() - now.getTime();
+      const difference = deadline.getTime() - now.getTime();
 
       if (difference <= 0) {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -36,7 +36,6 @@ export default function Home() {
 
     updateCountdown();
     const timer = setInterval(updateCountdown, 1000);
-
     return () => clearInterval(timer);
   }, []);
 
@@ -72,7 +71,7 @@ export default function Home() {
               alt="CDA Estudiantes de Calbuco"
               width={260}
               height={260}
-              className="rounded-xl"
+              className="rounded-xl bg-white"
             />
 
             <div className="hidden md:block h-52 w-px bg-slate-500" />
@@ -140,17 +139,14 @@ export default function Home() {
                 <p className="text-3xl font-extrabold">{timeLeft.days}</p>
                 <p className="text-sm">{isSpanish ? "Días" : "Days"}</p>
               </div>
-
               <div>
                 <p className="text-3xl font-extrabold">{timeLeft.hours}</p>
                 <p className="text-sm">{isSpanish ? "Horas" : "Hours"}</p>
               </div>
-
               <div>
                 <p className="text-3xl font-extrabold">{timeLeft.minutes}</p>
                 <p className="text-sm">{isSpanish ? "Min" : "Min"}</p>
               </div>
-
               <div>
                 <p className="text-3xl font-extrabold">{timeLeft.seconds}</p>
                 <p className="text-sm">{isSpanish ? "Seg" : "Sec"}</p>
@@ -162,27 +158,21 @@ export default function Home() {
         <section className="rounded-3xl border border-slate-600/40 bg-slate-800/70 p-8 shadow-2xl">
           <div className="grid md:grid-cols-3 gap-8 border-b border-slate-600/40 pb-8 mb-8">
             <div>
-              <h2 className="text-2xl font-bold mb-4">
-                🏆 {isSpanish ? "Premios" : "Prizes"}
-              </h2>
+              <h2 className="text-2xl font-bold mb-4">🏆 {isSpanish ? "Premios" : "Prizes"}</h2>
               <p>🥇 {isSpanish ? "1° Lugar" : "1st Place"}: $150.000 CLP / €150</p>
               <p>🥈 {isSpanish ? "2° Lugar" : "2nd Place"}: $50.000 CLP / €50</p>
               <p>🥉 {isSpanish ? "3° Lugar" : "3rd Place"}: $30.000 CLP / €30</p>
             </div>
 
             <div>
-              <h2 className="text-2xl font-bold mb-4">
-                🎯 {isSpanish ? "Puntuación" : "Scoring"}
-              </h2>
+              <h2 className="text-2xl font-bold mb-4">🎯 {isSpanish ? "Puntuación" : "Scoring"}</h2>
               <p>✅ {isSpanish ? "Resultado exacto = 5 puntos" : "Exact score = 5 points"}</p>
               <p>✅ {isSpanish ? "Ganador o empate correcto = 3 puntos" : "Correct winner or draw = 3 points"}</p>
               <p>✅ {isSpanish ? "Invita a 2 participantes = +25 puntos" : "Invite 2 participants = +25 points"}</p>
             </div>
 
             <div>
-              <h2 className="text-2xl font-bold mb-4">
-                💰 {isSpanish ? "Inscripción" : "Entry Fee"}
-              </h2>
+              <h2 className="text-2xl font-bold mb-4">💰 {isSpanish ? "Inscripción" : "Entry Fee"}</h2>
               <p>{isSpanish ? "Valor de inscripción:" : "Entry fee:"}</p>
               <p className="text-2xl font-extrabold">$10.000 CLP o €10</p>
               <p>{isSpanish ? "Pago mediante transferencia bancaria." : "Payment by bank transfer."}</p>
@@ -191,45 +181,109 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 gap-10">
             <div>
-              <h2 className="text-2xl font-bold mb-4">
-                📋 {isSpanish ? "Reglas Generales" : "General Rules"}
-              </h2>
-
+              <h2 className="text-2xl font-bold mb-4">📋 {isSpanish ? "Reglas Generales" : "General Rules"}</h2>
               <ul className="space-y-3 list-disc list-inside">
                 <li>{isSpanish ? "Cada participante puede registrar una sola cuenta." : "Each participant may register only one account."}</li>
                 <li>{isSpanish ? "El pago debe estar confirmado para participar." : "Payment must be confirmed in order to participate."}</li>
-                <li>{isSpanish ? "Los pronósticos para cada fase deberán registrarse antes de una hora del inicio de dicha fase. Una vez cerrada la fase, no se podrán realizar modificaciones." : "Predictions for each stage must be submitted at least one hour before that stage begins. Once the stage is closed, predictions cannot be modified."}</li>
-                <li>{isSpanish ? "El ranking se actualizará al finalizar cada fecha de la Fase de Grupos y posteriormente al término de cada ronda eliminatoria." : "The ranking will be updated after each Group Stage matchday and then after each knockout round."}</li>
+                <li>{isSpanish ? "Los pronósticos de cada fecha se cerrarán cuando comience el primer partido de esa fecha." : "Predictions for each matchday will close when the first match of that matchday begins."}</li>
+                <li>{isSpanish ? "El ranking se actualizará al finalizar cada fecha de la Fase de Grupos y posteriormente al término de cada ronda eliminatoria." : "The ranking will be updated after each Group Stage matchday and after each knockout round."}</li>
                 <li>{isSpanish ? "En caso de empate final, se utilizará el número de resultados exactos acertados como criterio de desempate." : "In case of a final tie, exact score predictions will be used as the tiebreaker."}</li>
                 <li>{isSpanish ? "La participación implica la aceptación de todas las reglas del concurso." : "Participation implies acceptance of all contest rules."}</li>
               </ul>
             </div>
 
             <div>
-              <h2 className="text-2xl font-bold mb-4">
-                🎮 {isSpanish ? "¿Cómo se juega?" : "How to Play"}
-              </h2>
-
+              <h2 className="text-2xl font-bold mb-4">🎮 {isSpanish ? "¿Cómo se juega?" : "How to Play"}</h2>
               <ol className="space-y-4">
                 <li>1️⃣ {isSpanish ? "Inscríbete realizando el pago correspondiente." : "Register by completing the required payment."}</li>
-                <li>2️⃣ {isSpanish ? "Registra tus pronósticos antes del cierre de cada fase." : "Submit your predictions before each stage closes."}</li>
+                <li>2️⃣ {isSpanish ? "Registra tus pronósticos antes del cierre de cada fecha." : "Submit your predictions before each matchday closes."}</li>
                 <li>3️⃣ {isSpanish ? "Acumula puntos acertando resultados o ganadores." : "Earn points by predicting exact scores or winners."}</li>
                 <li>4️⃣ {isSpanish ? "Sigue el ranking oficial durante todo el Mundial." : "Follow the official ranking throughout the World Cup."}</li>
                 <li>5️⃣ {isSpanish ? "Compite por los premios finales." : "Compete for the final prizes."}</li>
               </ol>
 
               <div className="grid gap-4 mt-10">
-                <button className="bg-yellow-400 text-black font-extrabold py-5 rounded-xl hover:bg-yellow-300 text-xl">
+                <a href="/participar" className="block text-center bg-yellow-400 text-black font-extrabold py-5 rounded-xl hover:bg-yellow-300 text-xl transition">
                   🚀 {isSpanish ? "Participar Ahora" : "Join Now"}
-                </button>
+                </a>
 
-                <button className="bg-blue-600 text-white font-extrabold py-5 rounded-xl hover:bg-blue-500 text-xl">
+                <a href="/pronosticos" className="block text-center bg-green-500 text-black font-extrabold py-5 rounded-xl hover:bg-green-400 text-xl transition">
+                  ⚽ {isSpanish ? "Hacer Pronósticos" : "Make Predictions"}
+                </a>
+
+                <a href="/ranking" className="block text-center bg-blue-600 text-white font-extrabold py-5 rounded-xl hover:bg-blue-500 text-xl transition">
                   🏆 {isSpanish ? "Ver Ranking Oficial" : "View Official Ranking"}
-                </button>
+                </a>
               </div>
             </div>
           </div>
         </section>
+
+        <div className="mt-12 bg-slate-800 border border-slate-600 rounded-2xl p-8">
+          <h2 className="text-3xl font-extrabold text-center mb-8">
+            📲 {isSpanish ? "Contacto y Redes Sociales" : "Contact & Social Media"}
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-xl font-bold text-yellow-400 mb-4">
+                💬 {isSpanish ? "Consultas por WhatsApp" : "WhatsApp Support"}
+              </h3>
+
+              <div className="space-y-3">
+                <a
+                  href="https://wa.me/56998243007"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-green-600 hover:bg-green-500 p-4 rounded-xl font-bold"
+                >
+                  🇨🇱 Chile: +56 9 9824 3007
+                </a>
+
+                <a
+                  href="https://wa.me/353831426585"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-green-600 hover:bg-green-500 p-4 rounded-xl font-bold"
+                >
+                  🇮🇪 Irlanda: +353 83 142 6585
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-yellow-400 mb-4">
+                🌐 {isSpanish ? "Síguenos" : "Follow Us"}
+              </h3>
+
+              <div className="space-y-3">
+                <a
+                  href="https://www.instagram.com/cdaestudiantes"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-pink-600 hover:bg-pink-500 p-4 rounded-xl font-bold"
+                >
+                  📸 Instagram: @cdaestudiantes
+                </a>
+
+                <a
+                  href="https://www.facebook.com/people/CDA-ESTUDIANTES/100056363425926/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-blue-700 hover:bg-blue-600 p-4 rounded-xl font-bold"
+                >
+                  📘 Facebook: CDA ESTUDIANTES
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-center text-slate-300 mt-6">
+            {isSpanish
+              ? "¿Tienes dudas? Contáctanos por WhatsApp o redes sociales."
+              : "Questions? Contact us via WhatsApp or social media."}
+          </p>
+        </div>
 
         <p className="text-center text-slate-400 mt-8">
           {isSpanish
