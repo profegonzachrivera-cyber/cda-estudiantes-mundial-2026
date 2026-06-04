@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { supabase } from "../lib/supabaseClient";
 
 type TeamKey =
   | "mexico" | "southAfrica" | "southKorea" | "czechRepublic" | "canada"
@@ -166,7 +167,19 @@ const matches: Match[] = [
 export default function PronosticosPage() {
   const [language, setLanguage] = useState<"es" | "en">("es");
   const [section, setSection] = useState(0);
+const [participant, setParticipant] = useState({
+  nombre: "",
+  email: "",
+  whatsapp: "",
+  pais: "",
+});
 
+const [predictions, setPredictions] = useState<
+  Record<number, { home: string; away: string }>
+>({});
+
+const [saving, setSaving] = useState(false);
+const [message, setMessage] = useState("");
   const isSpanish = language === "es";
   const matchesPerSection = 12;
   const totalSections = Math.ceil(matches.length / matchesPerSection);
@@ -181,7 +194,94 @@ export default function PronosticosPage() {
   };
 
   const teamName = (team: TeamKey) => (isSpanish ? teams[team].es : teams[team].en);
+const handleParticipantChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setParticipant({
+    ...participant,
+    [e.target.name]: e.target.value,
+  });
+};
 
+const handlePredictionChange = (
+  matchId: number,
+  team: "home" | "away",
+  value: string
+) => {
+  setPredictions({
+    ...predictions,
+    [matchId]: {
+      ...predictions[matchId],
+      [team]: value,
+    },
+  });
+};
+
+const savePredictions = async () => {
+  setMessage("");
+
+  if (!participant.nombre || !participant.email || !participant.whatsapp) {
+    setMessage(
+      isSpanish
+        ? "Completa nombre, correo y WhatsApp antes de guardar."
+        : "Please complete name, email and WhatsApp before saving."
+    );
+    return;
+  }
+
+  const rows = matches
+    .filter(
+      (match) =>
+        predictions[match.id]?.home !== undefined &&
+        predictions[match.id]?.away !== undefined &&
+        predictions[match.id]?.home !== "" &&
+        predictions[match.id]?.away !== ""
+    )
+    .map((match) => ({
+      nombre: participant.nombre,
+      email: participant.email,
+      whatsapp: participant.whatsapp,
+      pais: participant.pais,
+      partido_id: match.id,
+      equipo_local: teamName(match.home),
+      equipo_visitante: teamName(match.away),
+      goles_local: Number(predictions[match.id].home),
+      goles_visitante: Number(predictions[match.id].away),
+      fase: "Fase de Grupos",
+      fecha: isSpanish ? match.dateEs : match.dateEn,
+      grupo: match.group,
+      puntos: 0,
+    }));
+
+  if (rows.length === 0) {
+    setMessage(
+      isSpanish
+        ? "Debes ingresar al menos un pronóstico."
+        : "You must enter at least one prediction."
+    );
+    return;
+  }
+
+  setSaving(true);
+
+  const { error } = await supabase.from("pronosticos").insert(rows);
+
+  setSaving(false);
+
+  if (error) {
+    console.log(error);
+    setMessage(
+      isSpanish
+        ? "No se pudieron guardar los pronósticos. Intenta nuevamente."
+        : "Predictions could not be saved. Please try again."
+    );
+    return;
+  }
+
+  setMessage(
+    isSpanish
+      ? "✅ Pronósticos guardados correctamente."
+      : "✅ Predictions saved successfully."
+  );
+};
   return (
     <main className="min-h-screen bg-[#07111f] text-white px-6 py-10">
       <div className="max-w-6xl mx-auto">
@@ -222,7 +322,51 @@ export default function PronosticosPage() {
               : "World Cup 2026 Group Stage. Matches are displayed in sections of 12."}
           </p>
         </section>
+<div className="bg-slate-800 rounded-2xl p-6 mb-8 border border-slate-600">
+  <h2 className="text-2xl font-extrabold mb-5">
+    👤 {isSpanish ? "Datos del participante" : "Participant details"}
+  </h2>
 
+  <p className="text-slate-300 mb-5">
+    {isSpanish
+      ? "Usa los mismos datos que enviaste en tu inscripción por WhatsApp."
+      : "Use the same details you sent in your WhatsApp registration."}
+  </p>
+
+  <div className="grid md:grid-cols-2 gap-4">
+    <input
+      name="nombre"
+      value={participant.nombre}
+      onChange={handleParticipantChange}
+      className="p-4 rounded-xl bg-white text-black"
+      placeholder={isSpanish ? "Nombre completo" : "Full name"}
+    />
+
+    <input
+      name="email"
+      value={participant.email}
+      onChange={handleParticipantChange}
+      className="p-4 rounded-xl bg-white text-black"
+      placeholder={isSpanish ? "Correo electrónico" : "Email address"}
+    />
+
+    <input
+      name="whatsapp"
+      value={participant.whatsapp}
+      onChange={handleParticipantChange}
+      className="p-4 rounded-xl bg-white text-black"
+      placeholder="WhatsApp"
+    />
+
+    <input
+      name="pais"
+      value={participant.pais}
+      onChange={handleParticipantChange}
+      className="p-4 rounded-xl bg-white text-black"
+      placeholder={isSpanish ? "País" : "Country"}
+    />
+  </div>
+</div>
         <div className="flex gap-3 flex-wrap justify-center mb-8">
           {Array.from({ length: totalSections }, (_, index) => (
             <button
@@ -304,6 +448,8 @@ export default function PronosticosPage() {
                     type="number"
                     min="0"
                     disabled={locked}
+                    value={predictions[match.id]?.home || ""}
+onChange={(e) => handlePredictionChange(match.id, "home", e.target.value)}
                     className="p-3 rounded-xl bg-white text-black text-center font-bold disabled:bg-slate-500"
                     placeholder="0"
                   />
@@ -314,6 +460,8 @@ export default function PronosticosPage() {
                     type="number"
                     min="0"
                     disabled={locked}
+                    value={predictions[match.id]?.away || ""}
+onChange={(e) => handlePredictionChange(match.id, "away", e.target.value)}
                     className="p-3 rounded-xl bg-white text-black text-center font-bold disabled:bg-slate-500"
                     placeholder="0"
                   />
@@ -331,10 +479,20 @@ export default function PronosticosPage() {
             );
           })}
         </div>
-
-        <button className="w-full mt-8 bg-yellow-400 text-black px-6 py-5 rounded-xl font-extrabold text-xl hover:bg-yellow-300">
-          💾 {isSpanish ? "Guardar pronósticos" : "Save predictions"}
-        </button>
+{message && (
+  <div className="mt-6 p-4 rounded-xl bg-slate-800 border border-slate-600 text-center">
+    {message}
+  </div>
+)}
+   <button
+  onClick={savePredictions}
+  disabled={saving}
+  className="w-full mt-8 bg-yellow-400 text-black px-6 py-5 rounded-xl font-extrabold text-xl hover:bg-yellow-300 disabled:bg-slate-500"
+>
+{saving
+  ? (isSpanish ? "Guardando..." : "Saving...")
+  : `💾 ${isSpanish ? "Guardar pronósticos" : "Save predictions"}`}
+          </button>
       </div>
     </main>
   );
