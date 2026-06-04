@@ -98,7 +98,17 @@ export default function Home() {
               ? "Vive la emoción del Mundial de Fútbol FIFA 2026. Predice los resultados del torneo que se disputará en Estados Unidos, Canadá y México, acumula puntos, sigue el ranking oficial y compite por premios en efectivo mientras apoyas al Club Deportivo Estudiantes de Calbuco."
               : "Experience the excitement of the FIFA World Cup 2026. Predict the results of the tournament hosted by the United States, Canada and Mexico, earn points, follow the official ranking and compete for cash prizes while supporting Club Deportivo Estudiantes de Calbuco."}
           </p>
+<div className="w-full max-w-3xl mb-8 rounded-xl border border-yellow-500 bg-yellow-500/10 p-5 text-center">
+  <h3 className="text-2xl font-extrabold text-yellow-400 mb-3">
+    🎁 {isSpanish ? "Programa de Referidos" : "Referral Program"}
+  </h3>
 
+  <p className="text-slate-200">
+    {isSpanish
+      ? "Invita a 2 amigos al concurso. Si ambos completan su inscripción y envían su comprobante de pago, recibirás +25 puntos extra en el ranking oficial."
+      : "Invite 2 friends to the competition. If both complete their registration and submit their payment receipt, you will receive +25 bonus points in the official ranking."}
+  </p>
+</div>
           <div className="grid md:grid-cols-3 gap-4 w-full mb-8">
             <div className="rounded-xl bg-slate-800 border border-slate-600 p-4 font-bold">
               📅 {isSpanish ? "Inicio del Mundial" : "World Cup starts"}:
