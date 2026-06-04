@@ -227,17 +227,7 @@ const savePredictions = async () => {
     return;
   }
 
-const rows = currentMatches
-  .filter((match) => {
-  const prediction = predictions[match.id];
-
-  return (
-    prediction &&
-    Object.prototype.hasOwnProperty.call(prediction, "home") &&
-    Object.prototype.hasOwnProperty.call(prediction, "away")
-  );
-})
-    .map((match) => ({
+const rows = currentMatches.map((match) => ({
       nombre: participant.nombre,
       email: participant.email,
       whatsapp: participant.whatsapp,
@@ -245,8 +235,8 @@ const rows = currentMatches
       partido_id: match.id,
       equipo_local: teamName(match.home),
       equipo_visitante: teamName(match.away),
-      goles_local: Number(predictions[match.id].home),
-      goles_visitante: Number(predictions[match.id].away),
+      goles_local: Number(predictions[match.id]?.home ?? 0),
+      goles_visitante: Number(predictions[match.id]?.away ?? 0),
       fase: "Fase de Grupos",
       fecha: isSpanish ? match.dateEs : match.dateEn,
       grupo: match.group,
