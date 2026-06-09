@@ -226,7 +226,27 @@ const savePredictions = async () => {
     );
     return;
   }
+const { error: participantError } = await supabase.from("participantes").upsert(
+  {
+    nombre: participant.nombre,
+    email: participant.email,
+    whatsapp: participant.whatsapp,
+    pais: participant.pais,
+    estado_pago: "pendiente",
+    puntos: 0,
+  },
+  { onConflict: "email" }
+);
 
+if (participantError) {
+  console.log(participantError);
+  setMessage(
+    isSpanish
+      ? "No se pudo crear el participante. Revisa la configuración de Supabase."
+      : "Participant could not be created. Check Supabase configuration."
+  );
+  return;
+}
 const rows = currentMatches.map((match) => ({
       nombre: participant.nombre,
       email: participant.email,
