@@ -75,7 +75,7 @@ export default function MisPronosticosPage() {
             placeholder="Correo electrónico"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-4 rounded-lg text-black mb-4"
+            className="w-full p-4 rounded-lg bg-white text-black placeholder:text-gray-500 mb-4"
           />
 
           <button
