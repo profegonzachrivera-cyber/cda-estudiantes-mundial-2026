@@ -239,7 +239,8 @@ const { error: participantError } = await supabase.from("participantes").upsert(
 );
 
 if (participantError) {
-  console.log(participantError);
+  console.error("ERROR PARTICIPANTE:", participantError);
+alert(JSON.stringify(participantError));
   setMessage(
     isSpanish
       ? "No se pudo crear el participante. Revisa la configuración de Supabase."
