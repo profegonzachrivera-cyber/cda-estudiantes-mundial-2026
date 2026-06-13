@@ -41,15 +41,22 @@ export default function CorreccionPage() {
       return;
     }
 
-    const rows = partidos.map((id) => ({
-      nombre: form.nombre,
-      email: form.email.trim().toLowerCase(),
-      whatsapp: form.whatsapp,
-      partido_id: id,
-      goles_local: Number(predictions[id]?.local ?? 0),
-      goles_visitante: Number(predictions[id]?.visita ?? 0),
-    }));
-
+    const rows = partidos
+  .filter(
+    (id) =>
+      predictions[id]?.local !== undefined &&
+      predictions[id]?.visita !== undefined &&
+      predictions[id]?.local !== "" &&
+      predictions[id]?.visita !== ""
+  )
+  .map((id) => ({
+    nombre: form.nombre,
+    email: form.email.trim().toLowerCase(),
+    whatsapp: form.whatsapp,
+    partido_id: id,
+    goles_local: Number(predictions[id].local),
+    goles_visitante: Number(predictions[id].visita),
+  }));
     setSaving(true);
 
     const { error } = await supabase
