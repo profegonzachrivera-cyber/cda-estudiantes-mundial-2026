@@ -226,7 +226,24 @@ const savePredictions = async () => {
     );
     return;
   }
-const { error: participantError } = await supabase.from("participantes").upsert(
+alert("Intentando guardar participante");
+const { data: participanteData, error: participantError } = await supabase
+  .from("participantes")
+  .upsert(
+    {
+      nombre: participant.nombre,
+      email: participant.email,
+      whatsapp: participant.whatsapp,
+      pais: participant.pais,
+      estado_pago: "pendiente",
+      puntos: 0,
+    },
+    { onConflict: "email" }
+  )
+  .select();
+alert("Upsert participante ejecutado");
+console.log("PARTICIPANTE:", participanteData);
+console.error("ERROR PARTICIPANTE:", participantError);
   {
     nombre: participant.nombre,
     email: participant.email,
@@ -238,7 +255,7 @@ const { error: participantError } = await supabase.from("participantes").upsert(
   { onConflict: "email" }
 );
 
-if (participantError) {
+if (participantError) {alert(JSON.stringify(participantError));
   console.error("ERROR PARTICIPANTE:", participantError);
 alert(JSON.stringify(participantError));
   setMessage(
