@@ -244,25 +244,17 @@ const { data: participanteData, error: participantError } = await supabase
 alert("Upsert participante ejecutado");
 console.log("PARTICIPANTE:", participanteData);
 console.error("ERROR PARTICIPANTE:", participantError);
-  {
-    nombre: participant.nombre,
-    email: participant.email,
-    whatsapp: participant.whatsapp,
-    pais: participant.pais,
-    estado_pago: "pendiente",
-    puntos: 0,
-  },
-  { onConflict: "email" }
-);
 
-if (participantError) {alert(JSON.stringify(participantError));
+if (participantError) {
+  alert(JSON.stringify(participantError));
   console.error("ERROR PARTICIPANTE:", participantError);
-alert(JSON.stringify(participantError));
+
   setMessage(
     isSpanish
       ? "No se pudo crear el participante. Revisa la configuración de Supabase."
       : "Participant could not be created. Check Supabase configuration."
   );
+
   return;
 }
 const rows = currentMatches.map((match) => ({
