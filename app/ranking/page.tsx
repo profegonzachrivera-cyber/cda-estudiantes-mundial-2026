@@ -1,15 +1,37 @@
-export default function RankingPage() {
-  const ranking = Array.from({ length: 50 }, (_, index) => ({
-    position: index + 1,
-    name: "Próximamente",
-    flag: "🌍",
-    points: 0,
-  }));
+"use client";
 
-  const groups = [];
-  for (let i = 0; i < ranking.length; i += 10) {
-    groups.push(ranking.slice(i, i + 10));
-  }
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabaseClient";
+
+type RankingRow = {
+  email: string;
+  nombre: string;
+  whatsapp: string | null;
+  pais: string | null;
+  pronosticos_enviados: number;
+  puntos_totales: number;
+};
+
+export default function RankingPage() {
+  const [ranking, setRanking] = useState<RankingRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const cargarRanking = async () => {
+      const { data, error } = await supabase
+        .from("ranking_automatico")
+        .select("*")
+        .order("puntos_totales", { ascending: false });
+
+      if (!error && data) {
+        setRanking(data as RankingRow[]);
+      }
+
+      setLoading(false);
+    };
+
+    cargarRanking();
+  }, []);
 
   const medal = (position: number) => {
     if (position === 1) return "🥇";
@@ -26,88 +48,58 @@ export default function RankingPage() {
         </a>
 
         <section className="text-center my-10">
-          <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-8">
-            <img
-              src="/logo-cdae.jpg"
-              alt="CDAE"
-              className="h-36 rounded-xl bg-white"
-            />
-
-            <div className="hidden md:block h-32 w-px bg-slate-500" />
-
-            <img
-              src="/logo-mundial-2026.jpg"
-              alt="Mundial 2026"
-              className="h-36 rounded-xl bg-white p-3"
-            />
-          </div>
-
           <h1 className="text-5xl font-extrabold mb-4">🏆 Ranking Oficial</h1>
-
           <p className="text-slate-300 text-lg">
-            Ranking completo de participantes del CDA Estudiantes Mundial 2026.
+            Ranking oficial del Concurso Mundialero CDAE 2026.
           </p>
         </section>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {groups.map((group, index) => (
-            <div
-              key={index}
-              className="bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-700"
-            >
-              <h2 className="text-2xl font-bold mb-5 text-yellow-400">
-                Posiciones {index * 10 + 1} - {index * 10 + group.length}
-              </h2>
+        {loading && (
+          <div className="bg-slate-800 rounded-xl p-6 text-center font-bold">
+            Cargando ranking...
+          </div>
+        )}
 
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-slate-600 text-slate-300">
-                    <th className="py-3">Pos</th>
-                    <th className="py-3">Participante</th>
-                    <th className="py-3 text-center">🌍</th>
-                    <th className="py-3 text-right">Puntos</th>
+        {!loading && ranking.length === 0 && (
+          <div className="bg-slate-800 rounded-xl p-6 text-center font-bold">
+            El ranking estará disponible próximamente.
+          </div>
+        )}
+
+        {!loading && ranking.length > 0 && (
+          <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-slate-600 text-slate-300">
+                  <th className="py-3">Pos</th>
+                  <th className="py-3">Participante</th>
+                  <th className="py-3 text-center">Pronósticos</th>
+                  <th className="py-3 text-right">Puntos</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {ranking.map((player, index) => (
+                  <tr key={player.email} className="border-b border-slate-700">
+                    <td className="py-3 font-bold text-yellow-400">
+                      {medal(index + 1)}
+                    </td>
+                    <td className="py-3">{player.nombre}</td>
+                    <td className="py-3 text-center">
+                      {player.pronosticos_enviados}
+                    </td>
+                    <td className="py-3 text-right font-bold">
+                      {player.puntos_totales}
+                    </td>
                   </tr>
-                </thead>
-
-                <tbody>
-                  {group.map((player) => (
-                    <tr
-                      key={player.position}
-                      className="border-b border-slate-700"
-                    >
-                      <td className="py-3 font-bold text-yellow-400">
-                        {medal(player.position)}
-                      </td>
-
-                      <td className="py-3">{player.name}</td>
-
-                      <td className="py-3 text-center text-2xl">
-                        {player.flag}
-                      </td>
-
-                      <td className="py-3 text-right font-bold">
-                        {player.points}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
-        </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         <div className="mt-10 bg-blue-700 rounded-xl p-5 text-center font-bold">
-          📊 El ranking oficial será actualizado después de cada fecha de la
-          Fase de Grupos y al finalizar cada ronda eliminatoria.
-        </div>
-
-        <div className="mt-6 text-center">
-          <a
-            href="/ranking-instagram"
-            className="inline-block bg-pink-500 text-white font-extrabold px-8 py-4 rounded-xl hover:bg-pink-400"
-          >
-            📸 Ver versión para Instagram
-          </a>
+          📊 El ranking será actualizado después de cada fecha.
         </div>
       </div>
     </main>
