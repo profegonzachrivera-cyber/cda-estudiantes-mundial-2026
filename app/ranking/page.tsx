@@ -6,15 +6,16 @@ import { supabase } from "../lib/supabaseClient";
 type RankingRow = {
   email: string;
   nombre: string;
-  whatsapp: string | null;
   pais: string | null;
-  pronosticos_enviados: number;
+  bono_referidos: number;
   puntos_totales: number;
 };
 
 export default function RankingPage() {
   const [ranking, setRanking] = useState<RankingRow[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const partidosJugados = 12;
 
   useEffect(() => {
     const cargarRanking = async () => {
@@ -49,8 +50,9 @@ export default function RankingPage() {
 
         <section className="text-center my-10">
           <h1 className="text-5xl font-extrabold mb-4">🏆 Ranking Oficial</h1>
+
           <p className="text-slate-300 text-lg">
-            Ranking oficial del Concurso Mundialero CDAE 2026.
+            Ranking oficial después de {partidosJugados} partidos jugados.
           </p>
         </section>
 
@@ -73,7 +75,8 @@ export default function RankingPage() {
                 <tr className="border-b border-slate-600 text-slate-300">
                   <th className="py-3">Pos</th>
                   <th className="py-3">Participante</th>
-                  <th className="py-3 text-center">Pronósticos</th>
+                  <th className="py-3 text-center">País</th>
+                  <th className="py-3 text-center">Partidos jugados</th>
                   <th className="py-3 text-right">Puntos</th>
                 </tr>
               </thead>
@@ -84,10 +87,25 @@ export default function RankingPage() {
                     <td className="py-3 font-bold text-yellow-400">
                       {medal(index + 1)}
                     </td>
-                    <td className="py-3">{player.nombre}</td>
-                    <td className="py-3 text-center">
-                      {player.pronosticos_enviados}
+
+                    <td className="py-3">
+                      {player.nombre}
+                      {player.bono_referidos > 0 && (
+                        <span
+                          className="ml-2 text-yellow-400"
+                          title="Bonificación por referidos"
+                        >
+                          🎁
+                        </span>
+                      )}
                     </td>
+
+                    <td className="py-3 text-center">
+                      {player.pais || "🌍"}
+                    </td>
+
+                    <td className="py-3 text-center">{partidosJugados}</td>
+
                     <td className="py-3 text-right font-bold">
                       {player.puntos_totales}
                     </td>
@@ -98,7 +116,17 @@ export default function RankingPage() {
           </div>
         )}
 
-        <div className="mt-10 bg-blue-700 rounded-xl p-5 text-center font-bold">
+        <div className="mt-8 bg-slate-800 border border-yellow-500 rounded-xl p-5 text-center">
+          <p className="font-bold text-yellow-400 text-lg mb-2">
+            🎁 Bonificación por referidos
+          </p>
+          <p className="text-slate-200">
+            El símbolo 🎁 indica que el participante recibió +25 puntos extra
+            por invitar a dos personas que completaron su inscripción y pago.
+          </p>
+        </div>
+
+        <div className="mt-6 bg-blue-700 rounded-xl p-5 text-center font-bold">
           📊 El ranking será actualizado después de cada fecha.
         </div>
       </div>
