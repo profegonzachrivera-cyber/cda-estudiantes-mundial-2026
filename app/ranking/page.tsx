@@ -7,15 +7,41 @@ type RankingRow = {
   email: string;
   nombre: string;
   pais: string | null;
-  bono_referidos: number;
   puntos_totales: number;
 };
+
+const flags: Record<string, string> = {
+  chile: "🇨🇱",
+  brasil: "🇧🇷",
+  brazil: "🇧🇷",
+  ireland: "🇮🇪",
+  irlanda: "🇮🇪",
+  españa: "🇪🇸",
+  spain: "🇪🇸",
+  argentina: "🇦🇷",
+  colombia: "🇨🇴",
+  mexico: "🇲🇽",
+  méxico: "🇲🇽",
+  peru: "🇵🇪",
+  perú: "🇵🇪",
+  uruguay: "🇺🇾",
+  usa: "🇺🇸",
+  "estados unidos": "🇺🇸",
+};
+
+const referidos = [
+  "Jorge Alejandro Chávez Moil",
+  "Pedro Dariva Fidelis",
+  "pedro dariva",
+  "Leonardo Chávez Rivera",
+  "Gonzalo Chávez Rivera",
+];
 
 export default function RankingPage() {
   const [ranking, setRanking] = useState<RankingRow[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const partidosJugados = 12;
+  const partidosJugados = 24;
 
   useEffect(() => {
     const cargarRanking = async () => {
@@ -41,6 +67,17 @@ export default function RankingPage() {
     return `#${position}`;
   };
 
+  const countryFlag = (pais: string | null) => {
+    if (!pais) return "🌍";
+    return flags[pais.trim().toLowerCase()] || "🌍";
+  };
+
+  const tieneBono = (nombre: string) => {
+    return referidos.some(
+      (r) => r.trim().toLowerCase() === nombre.trim().toLowerCase()
+    );
+  };
+
   return (
     <main className="min-h-screen bg-[#07111f] text-white px-6 py-10">
       <div className="max-w-6xl mx-auto">
@@ -52,7 +89,7 @@ export default function RankingPage() {
           <h1 className="text-5xl font-extrabold mb-4">🏆 Ranking Oficial</h1>
 
           <p className="text-slate-300 text-lg">
-            Ranking oficial después de {partidosJugados} partidos jugados.
+            📊 Última actualización: después de los primeros {partidosJugados} partidos disputados.
           </p>
         </section>
 
@@ -76,7 +113,6 @@ export default function RankingPage() {
                   <th className="py-3">Pos</th>
                   <th className="py-3">Participante</th>
                   <th className="py-3 text-center">País</th>
-                  <th className="py-3 text-center">Partidos jugados</th>
                   <th className="py-3 text-right">Puntos</th>
                 </tr>
               </thead>
@@ -90,26 +126,19 @@ export default function RankingPage() {
 
                     <td className="py-3">
                       {player.nombre}
-                      
-                      {["Jorge Alejandro Chávez Moil",
-                      "Pedro Dariva Fidelis",
-                      "Leonardo Chávez Rivera",
-                      "Gonzalo Chávez Rivera", 
-                    ].includes(player.nombre) && (
+                      {tieneBono(player.nombre) && (
                         <span
                           className="ml-2 text-yellow-400"
-                          title="Bonificación por referidos"
+                          title="Bonificación por referidos (+25 puntos)"
                         >
                           🎁
                         </span>
                       )}
                     </td>
 
-                    <td className="py-3 text-center">
-                      {player.pais || "🌍"}
+                    <td className="py-3 text-center text-2xl">
+                      {countryFlag(player.pais)}
                     </td>
-
-                    <td className="py-3 text-center">{partidosJugados}</td>
 
                     <td className="py-3 text-right font-bold">
                       {player.puntos_totales}
@@ -126,8 +155,7 @@ export default function RankingPage() {
             🎁 Bonificación por referidos
           </p>
           <p className="text-slate-200">
-            El símbolo 🎁 indica que el participante recibió +25 puntos extra
-            por invitar a dos personas que completaron su inscripción y pago.
+            El símbolo 🎁 indica que el participante recibió +25 puntos extra por invitar a dos personas que completaron su inscripción y pago.
           </p>
         </div>
 
