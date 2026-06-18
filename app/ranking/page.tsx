@@ -90,7 +90,12 @@ export default function RankingPage() {
 
                     <td className="py-3">
                       {player.nombre}
-                      {player.bono_referidos > 0 && (
+                      
+                      {["Jorge Alejandro Chávez Moil",
+                      "Pedro Dariva Fidelis",
+                      "Leonardo Chávez Rivera",
+                      "Gonzalo Chávez Rivera", 
+                    ].includes(player.nombre) && (
                         <span
                           className="ml-2 text-yellow-400"
                           title="Bonificación por referidos"
