@@ -41,7 +41,7 @@ export default function RankingPage() {
   const [ranking, setRanking] = useState<RankingRow[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const partidosJugados = 36;
+  const partidosJugados = 48;
 
   useEffect(() => {
     const cargarRanking = async () => {
@@ -88,15 +88,15 @@ export default function RankingPage() {
         <section className="text-center my-10">
           <h1 className="text-5xl font-extrabold mb-4">🏆 Ranking Oficial</h1>
 
-          <p className="text-slate-300 text-lg">
-            📊 Última actualización: después de los primeros {partidosJugados} partidos disputados.
-          </p>
+          <p className="text-yellow-400 text-xl font-extrabold mt-2">
+  Actualizado después de 48 partidos
+</p>
         </section>
 
         {loading && (
-          <div className="bg-slate-800 rounded-xl p-6 text-center font-bold">
-            Cargando ranking...
-          </div>
+          <div className="mt-10 bg-blue-700 rounded-xl p-5 text-center font-bold">
+  📊 Ranking actualizado después de 48 partidos disputados.
+</div>
         )}
 
         {!loading && ranking.length === 0 && (
