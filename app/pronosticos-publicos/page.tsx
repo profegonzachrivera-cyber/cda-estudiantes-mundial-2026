@@ -28,12 +28,22 @@ export default function PronosticosPublicosPage() {
   useEffect(() => {
     const cargarParticipantes = async () => {
       const { data, error } = await supabase
-        .from("pronosticos")
+        .from("participantes")
         .select("nombre")
         .order("nombre", { ascending: true });
 
       if (!error && data) {
-        const nombres = Array.from(new Set(data.map((p) => p.nombre))).filter(Boolean);
+        const nombres = Array.from(
+          new Set(
+            data
+              .map((p) => p.nombre?.trim())
+              .filter(
+                (nombre): nombre is string =>
+                  Boolean(nombre && nombre.length > 0)
+              )
+          )
+        );
+
         setParticipantes(nombres);
       }
 
@@ -49,7 +59,7 @@ export default function PronosticosPublicosPage() {
     const { data, error } = await supabase
       .from("pronosticos")
       .select("*")
-      .eq("nombre", nombre)
+      .ilike("nombre", nombre)
       .order("partido_id", { ascending: true });
 
     if (!error && data) {
@@ -57,9 +67,10 @@ export default function PronosticosPublicosPage() {
     }
   };
 
-  const fechaEnvio = pronosticos[0]?.created_at
-    ? new Date(pronosticos[0].created_at).toLocaleString("es-CL")
-    : "No disponible";
+  const fechaEnvio =
+    pronosticos.length > 0
+      ? new Date(pronosticos[0].created_at).toLocaleString("es-CL")
+      : "No disponible";
 
   return (
     <main className="min-h-screen bg-[#07111f] text-white px-6 py-10">
@@ -80,8 +91,8 @@ export default function PronosticosPublicosPage() {
           </h1>
 
           <p className="text-slate-300 text-lg max-w-3xl mx-auto">
-            Todos los pronósticos son visibles para garantizar la transparencia
-            del Concurso Mundialero CDAE 2026.
+            Todos los pronósticos son públicos para garantizar la transparencia
+            del Concurso Mundialero CDA Estudiantes 2026.
           </p>
         </section>
 
@@ -96,6 +107,7 @@ export default function PronosticosPublicosPage() {
             className="w-full p-4 rounded-xl bg-white text-black font-bold"
           >
             <option value="">Selecciona un participante</option>
+
             {participantes.map((nombre) => (
               <option key={nombre} value={nombre}>
                 {nombre}
@@ -117,9 +129,22 @@ export default function PronosticosPublicosPage() {
                 {pronosticos[0].nombre}
               </h2>
 
-              <p>🌎 País: {pronosticos[0].pais || "No informado"}</p>
-              <p>📅 Primer envío: {fechaEnvio}</p>
-              <p>✅ Pronósticos enviados: {pronosticos.length}/72</p>
+              <div className="grid md:grid-cols-3 gap-4 mt-4">
+                <div>
+                  <p className="font-bold">🌎 País</p>
+                  <p>{pronosticos[0].pais || "No informado"}</p>
+                </div>
+
+                <div>
+                  <p className="font-bold">📅 Primer envío</p>
+                  <p>{fechaEnvio}</p>
+                </div>
+
+                <div>
+                  <p className="font-bold">✅ Pronósticos enviados</p>
+                  <p>{pronosticos.length}/72</p>
+                </div>
+              </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-5">
@@ -128,15 +153,21 @@ export default function PronosticosPublicosPage() {
                   key={p.id}
                   className="bg-slate-800 rounded-xl p-5 border border-slate-700"
                 >
-                  <div className="text-yellow-400 font-extrabold mb-2">
-                    Partido {p.partido_id} · Grupo {p.grupo}
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-yellow-400 font-extrabold">
+                      Partido {p.partido_id}
+                    </span>
+
+                    <span className="text-slate-400 text-sm">
+                      Grupo {p.grupo}
+                    </span>
                   </div>
 
-                  <div className="text-slate-300 text-sm mb-3">
+                  <div className="text-slate-400 text-sm mb-4">
                     {p.fecha}
                   </div>
 
-                  <div className="grid grid-cols-[1fr_70px_1fr] items-center gap-3">
+                  <div className="grid grid-cols-[1fr_90px_1fr] items-center gap-3">
                     <div className="font-bold text-right">
                       {p.equipo_local}
                     </div>
@@ -156,7 +187,7 @@ export default function PronosticosPublicosPage() {
         )}
 
         {!loading && selected && pronosticos.length === 0 && (
-          <div className="bg-slate-800 rounded-xl p-6 text-center font-bold">
+          <div className="bg-red-700 rounded-xl p-6 text-center font-bold">
             No se encontraron pronósticos para este participante.
           </div>
         )}
