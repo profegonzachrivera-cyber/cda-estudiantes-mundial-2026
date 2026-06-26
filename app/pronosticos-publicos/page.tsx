@@ -3,11 +3,17 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
+type Participante = {
+  nombre: string;
+  email: string;
+  puntos_totales: number;
+  pronosticos_enviados: number;
+};
+
 type Pronostico = {
   id: string;
   nombre: string;
   email: string;
-  whatsapp: string;
   pais: string | null;
   partido_id: number;
   equipo_local: string;
@@ -19,52 +25,101 @@ type Pronostico = {
   created_at: string;
 };
 
+type Resultado = {
+  partido_id: number;
+  goles_local: number;
+  goles_visitante: number;
+};
+
 export default function PronosticosPublicosPage() {
-  const [participantes, setParticipantes] = useState<string[]>([]);
-  const [selected, setSelected] = useState("");
+  const [participantes, setParticipantes] = useState<Participante[]>([]);
+  const [selectedEmail, setSelectedEmail] = useState("");
+  const [selectedParticipante, setSelectedParticipante] =
+    useState<Participante | null>(null);
   const [pronosticos, setPronosticos] = useState<Pronostico[]>([]);
+  const [resultados, setResultados] = useState<Resultado[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const cargarParticipantes = async () => {
-      const { data, error } = await supabase
-        .from("participantes")
-        .select("nombre")
-        .order("nombre", { ascending: true });
+    const cargarDatos = async () => {
+      const { data: rankingData } = await supabase
+        .from("ranking_automatico")
+        .select("nombre, email, puntos_totales, pronosticos_enviados")
+        .order("puntos_totales", { ascending: false });
 
-      if (!error && data) {
-        const nombres = Array.from(
-          new Set(
-            data
-              .map((p) => p.nombre?.trim())
-              .filter(
-                (nombre): nombre is string =>
-                  Boolean(nombre && nombre.length > 0)
-              )
-          )
-        );
+      const { data: resultadosData } = await supabase
+        .from("resultados")
+        .select("partido_id, goles_local, goles_visitante");
 
-        setParticipantes(nombres);
+      if (rankingData) {
+        setParticipantes(rankingData as Participante[]);
+      }
+
+      if (resultadosData) {
+        setResultados(resultadosData as Resultado[]);
       }
 
       setLoading(false);
     };
 
-    cargarParticipantes();
+    cargarDatos();
   }, []);
 
-  const cargarPronosticos = async (nombre: string) => {
-    setSelected(nombre);
+  const cargarPronosticos = async (email: string) => {
+    setSelectedEmail(email);
 
-    const { data, error } = await supabase
+    const participante =
+      participantes.find((p) => p.email === email) || null;
+
+    setSelectedParticipante(participante);
+
+    const { data } = await supabase
       .from("pronosticos")
       .select("*")
-      .ilike("nombre", nombre)
+      .eq("email", email)
       .order("partido_id", { ascending: true });
 
-    if (!error && data) {
-      setPronosticos(data as Pronostico[]);
+    setPronosticos((data || []) as Pronostico[]);
+  };
+
+  const calcularPuntos = (p: Pronostico) => {
+    const r = resultados.find((res) => res.partido_id === p.partido_id);
+
+    if (!r) {
+      return null;
     }
+
+    const exacto =
+      p.goles_local === r.goles_local &&
+      p.goles_visitante === r.goles_visitante;
+
+    if (exacto) {
+      return 5;
+    }
+
+    const resultadoPronostico =
+      p.goles_local > p.goles_visitante
+        ? "local"
+        : p.goles_local < p.goles_visitante
+        ? "visita"
+        : "empate";
+
+    const resultadoReal =
+      r.goles_local > r.goles_visitante
+        ? "local"
+        : r.goles_local < r.goles_visitante
+        ? "visita"
+        : "empate";
+
+    if (resultadoPronostico === resultadoReal) {
+      return 3;
+    }
+
+    return 0;
+  };
+
+  const resultadoReal = (partidoId: number) => {
+    return resultados.find((r) => r.partido_id === partidoId);
   };
 
   const fechaEnvio =
@@ -91,7 +146,7 @@ export default function PronosticosPublicosPage() {
           </h1>
 
           <p className="text-slate-300 text-lg max-w-3xl mx-auto">
-            Todos los pronósticos son públicos para garantizar la transparencia
+            Todos los pronósticos son visibles para garantizar la transparencia
             del Concurso Mundialero CDA Estudiantes 2026.
           </p>
         </section>
@@ -102,15 +157,15 @@ export default function PronosticosPublicosPage() {
           </label>
 
           <select
-            value={selected}
+            value={selectedEmail}
             onChange={(e) => cargarPronosticos(e.target.value)}
             className="w-full p-4 rounded-xl bg-white text-black font-bold"
           >
             <option value="">Selecciona un participante</option>
 
-            {participantes.map((nombre) => (
-              <option key={nombre} value={nombre}>
-                {nombre}
+            {participantes.map((p) => (
+              <option key={p.email} value={p.email}>
+                {p.nombre}
               </option>
             ))}
           </select>
@@ -122,14 +177,14 @@ export default function PronosticosPublicosPage() {
           </div>
         )}
 
-        {pronosticos.length > 0 && (
+        {pronosticos.length > 0 && selectedParticipante && (
           <>
             <div className="bg-blue-700 rounded-2xl p-6 mb-8">
               <h2 className="text-3xl font-extrabold mb-3">
-                {pronosticos[0].nombre}
+                {selectedParticipante.nombre}
               </h2>
 
-              <div className="grid md:grid-cols-3 gap-4 mt-4">
+              <div className="grid md:grid-cols-4 gap-4 mt-4">
                 <div>
                   <p className="font-bold">🌎 País</p>
                   <p>{pronosticos[0].pais || "No informado"}</p>
@@ -141,52 +196,88 @@ export default function PronosticosPublicosPage() {
                 </div>
 
                 <div>
-                  <p className="font-bold">✅ Pronósticos enviados</p>
-                  <p>{pronosticos.length}/72</p>
+                  <p className="font-bold">✅ Pronósticos</p>
+                  <p>{selectedParticipante.pronosticos_enviados}/72</p>
+                </div>
+
+                <div>
+                  <p className="font-bold">🏆 Puntos totales</p>
+                  <p>{selectedParticipante.puntos_totales}</p>
                 </div>
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-5">
-              {pronosticos.map((p) => (
-                <div
-                  key={p.id}
-                  className="bg-slate-800 rounded-xl p-5 border border-slate-700"
-                >
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-yellow-400 font-extrabold">
-                      Partido {p.partido_id}
-                    </span>
+              {pronosticos.map((p) => {
+                const puntos = calcularPuntos(p);
+                const real = resultadoReal(p.partido_id);
 
-                    <span className="text-slate-400 text-sm">
-                      Grupo {p.grupo}
-                    </span>
-                  </div>
+                return (
+                  <div
+                    key={p.id}
+                    className="bg-slate-800 rounded-xl p-5 border border-slate-700"
+                  >
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-yellow-400 font-extrabold">
+                        Partido {p.partido_id}
+                      </span>
 
-                  <div className="text-slate-400 text-sm mb-4">
-                    {p.fecha}
-                  </div>
-
-                  <div className="grid grid-cols-[1fr_90px_1fr] items-center gap-3">
-                    <div className="font-bold text-right">
-                      {p.equipo_local}
+                      <span className="text-slate-400 text-sm">
+                        Grupo {p.grupo}
+                      </span>
                     </div>
 
-                    <div className="bg-white text-black rounded-xl py-3 text-center font-extrabold text-xl">
-                      {p.goles_local} - {p.goles_visitante}
+                    <div className="text-slate-400 text-sm mb-4">
+                      {p.fecha}
                     </div>
 
-                    <div className="font-bold">
-                      {p.equipo_visitante}
+                    <div className="grid grid-cols-[1fr_90px_1fr] items-center gap-3 mb-4">
+                      <div className="font-bold text-right">
+                        {p.equipo_local}
+                      </div>
+
+                      <div className="bg-white text-black rounded-xl py-3 text-center font-extrabold text-xl">
+                        {p.goles_local} - {p.goles_visitante}
+                      </div>
+
+                      <div className="font-bold">
+                        {p.equipo_visitante}
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-900 rounded-xl p-4 text-sm">
+                      <p>
+                        📅 Enviado:{" "}
+                        {new Date(p.created_at).toLocaleString("es-CL")}
+                      </p>
+
+                      {real ? (
+                        <p>
+                          ⚽ Resultado real: {real.goles_local} -{" "}
+                          {real.goles_visitante}
+                        </p>
+                      ) : (
+                        <p>⚽ Resultado real: Pendiente</p>
+                      )}
+
+                      <p className="font-extrabold mt-2">
+                        {puntos === null
+                          ? "⏳ Puntos: Pendiente"
+                          : puntos === 5
+                          ? "🟢 Puntos: 5 — Marcador exacto"
+                          : puntos === 3
+                          ? "🟡 Puntos: 3 — Acertó ganador/empate"
+                          : "🔴 Puntos: 0"}
+                      </p>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         )}
 
-        {!loading && selected && pronosticos.length === 0 && (
+        {!loading && selectedEmail && pronosticos.length === 0 && (
           <div className="bg-red-700 rounded-xl p-6 text-center font-bold">
             No se encontraron pronósticos para este participante.
           </div>
