@@ -89,13 +89,13 @@ export default function RankingPage() {
           <h1 className="text-5xl font-extrabold mb-4">🏆 Ranking Oficial</h1>
 
           <p className="text-yellow-400 text-xl font-extrabold mt-2">
-  Actualizado después de 48 partidos
+  Actualizado después de 60 partidos
 </p>
         </section>
 
         {loading && (
           <div className="mt-10 bg-blue-700 rounded-xl p-5 text-center font-bold">
-  📊 Ranking actualizado después de 48 partidos disputados.
+  📊 Ranking actualizado después de 60 partidos disputados.
 </div>
         )}
 
