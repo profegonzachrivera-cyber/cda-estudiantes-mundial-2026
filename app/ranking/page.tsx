@@ -41,7 +41,7 @@ export default function RankingPage() {
   const [ranking, setRanking] = useState<RankingRow[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const partidosJugados = 48;
+  const partidosJugados = 60;
 
   useEffect(() => {
     const cargarRanking = async () => {
