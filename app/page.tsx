@@ -224,6 +224,12 @@ export default function Home() {
                 <a href="/ranking" className="block text-center bg-blue-600 text-white font-extrabold py-5 rounded-xl hover:bg-blue-500 text-xl transition">
                   🏆 {isSpanish ? "Ver Ranking Oficial" : "View Official Ranking"}
                 </a>
+		<a
+  		   href="/dieciseisavos"
+                   className="block text-center bg-purple-600 text-white font-extrabold py-5 rounded-xl hover:bg-purple-500 text-xl transition"
+>
+                  🏆 {isSpanish ? "16avos de Final" : "Round of 32"}
+</a>
               </div>
             </div>
           </div>
