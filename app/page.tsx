@@ -228,6 +228,12 @@ export default function Home() {
   		   href="/dieciseisavos"
                    className="block text-center bg-purple-600 text-white font-extrabold py-5 rounded-xl hover:bg-purple-500 text-xl transition"
 >
+<a
+  href="/dieciseisavos-pronosticos"
+  className="block text-center bg-green-600 text-white font-extrabold py-5 rounded-xl hover:bg-green-500 text-xl transition"
+>
+  🎯 {isSpanish ? "Pronósticos 16avos" : "Round of 32 Predictions"}
+</a>
                   🏆 {isSpanish ? "16avos de Final" : "Round of 32"}
 </a>
               </div>
