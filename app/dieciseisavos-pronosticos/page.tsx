@@ -5,14 +5,13 @@ import { supabase } from "../lib/supabaseClient";
 
 type Partido = {
   id: number;
-  grupo: string;
   fechaEs: string;
   fechaEn: string;
   horaChile: string;
   horaIrlanda: string;
   cierreChile: string;
+  cierreIrlanda: string;
   cierreDate: string;
-  kickoffDate: string;
   localEs: string;
   localEn: string;
   visitanteEs: string;
@@ -23,7 +22,8 @@ type Partido = {
 
 export default function DieciseisavosPronosticosPage() {
   const [language, setLanguage] = useState<"es" | "en">("es");
-  const [saving, setSaving] = useState(false);
+  const [savingMatch, setSavingMatch] = useState<number | null>(null);
+  const [savedMatches, setSavedMatches] = useState<Record<number, string>>({});
   const [message, setMessage] = useState("");
 
   const [participant, setParticipant] = useState({
@@ -42,13 +42,12 @@ export default function DieciseisavosPronosticosPage() {
   const partidos: Partido[] = [
     {
       id: 73,
-      grupo: "16avos",
       fechaEs: "Domingo 28 junio",
       fechaEn: "Sunday, June 28",
       horaChile: "15:00 hrs Chile",
       horaIrlanda: "20:00 hrs Ireland",
       cierreChile: "14:00 hrs Chile",
-      kickoffDate: "2026-06-28T15:00:00-04:00",
+      cierreIrlanda: "19:00 hrs Ireland",
       cierreDate: "2026-06-28T14:00:00-04:00",
       localEs: "Sudáfrica",
       localEn: "South Africa",
@@ -59,13 +58,12 @@ export default function DieciseisavosPronosticosPage() {
     },
     {
       id: 74,
-      grupo: "16avos",
       fechaEs: "Lunes 29 junio",
       fechaEn: "Monday, June 29",
       horaChile: "13:00 hrs Chile",
       horaIrlanda: "18:00 hrs Ireland",
       cierreChile: "12:00 hrs Chile",
-      kickoffDate: "2026-06-29T13:00:00-04:00",
+      cierreIrlanda: "17:00 hrs Ireland",
       cierreDate: "2026-06-29T12:00:00-04:00",
       localEs: "Brasil",
       localEn: "Brazil",
@@ -76,13 +74,12 @@ export default function DieciseisavosPronosticosPage() {
     },
     {
       id: 75,
-      grupo: "16avos",
       fechaEs: "Lunes 29 junio",
       fechaEn: "Monday, June 29",
       horaChile: "16:30 hrs Chile",
       horaIrlanda: "21:30 hrs Ireland",
       cierreChile: "15:30 hrs Chile",
-      kickoffDate: "2026-06-29T16:30:00-04:00",
+      cierreIrlanda: "20:30 hrs Ireland",
       cierreDate: "2026-06-29T15:30:00-04:00",
       localEs: "Alemania",
       localEn: "Germany",
@@ -93,13 +90,12 @@ export default function DieciseisavosPronosticosPage() {
     },
     {
       id: 76,
-      grupo: "16avos",
       fechaEs: "Lunes 29 junio",
       fechaEn: "Monday, June 29",
       horaChile: "21:00 hrs Chile",
       horaIrlanda: "02:00 hrs Ireland",
       cierreChile: "20:00 hrs Chile",
-      kickoffDate: "2026-06-29T21:00:00-04:00",
+      cierreIrlanda: "01:00 hrs Ireland",
       cierreDate: "2026-06-29T20:00:00-04:00",
       localEs: "Países Bajos",
       localEn: "Netherlands",
@@ -110,13 +106,12 @@ export default function DieciseisavosPronosticosPage() {
     },
     {
       id: 77,
-      grupo: "16avos",
       fechaEs: "Martes 30 junio",
       fechaEn: "Tuesday, June 30",
       horaChile: "13:00 hrs Chile",
       horaIrlanda: "18:00 hrs Ireland",
       cierreChile: "12:00 hrs Chile",
-      kickoffDate: "2026-06-30T13:00:00-04:00",
+      cierreIrlanda: "17:00 hrs Ireland",
       cierreDate: "2026-06-30T12:00:00-04:00",
       localEs: "Costa de Marfil",
       localEn: "Ivory Coast",
@@ -127,13 +122,12 @@ export default function DieciseisavosPronosticosPage() {
     },
     {
       id: 78,
-      grupo: "16avos",
       fechaEs: "Martes 30 junio",
       fechaEn: "Tuesday, June 30",
       horaChile: "17:00 hrs Chile",
       horaIrlanda: "22:00 hrs Ireland",
       cierreChile: "16:00 hrs Chile",
-      kickoffDate: "2026-06-30T17:00:00-04:00",
+      cierreIrlanda: "21:00 hrs Ireland",
       cierreDate: "2026-06-30T16:00:00-04:00",
       localEs: "Francia",
       localEn: "France",
@@ -144,17 +138,8 @@ export default function DieciseisavosPronosticosPage() {
     },
   ];
 
-  const isClosed = (partido: Partido) => {
-    return new Date() >= new Date(partido.cierreDate);
-  };
-
-  const teamName = (partido: Partido, side: "local" | "visitante") => {
-    if (side === "local") {
-      return isSpanish ? partido.localEs : partido.localEn;
-    }
-
-    return isSpanish ? partido.visitanteEs : partido.visitanteEn;
-  };
+  const isClosed = (partido: Partido) =>
+    new Date() >= new Date(partido.cierreDate);
 
   const handlePredictionChange = (
     partidoId: number,
@@ -171,7 +156,7 @@ export default function DieciseisavosPronosticosPage() {
     }));
   };
 
-  const handleSubmit = async () => {
+  const saveMatch = async (match: Partido) => {
     setMessage("");
 
     if (
@@ -182,66 +167,75 @@ export default function DieciseisavosPronosticosPage() {
     ) {
       setMessage(
         isSpanish
-          ? "Completa nombre, correo, WhatsApp y país."
-          : "Please complete name, email, WhatsApp and country."
+          ? "Completa tus datos antes de guardar."
+          : "Please complete your details before saving."
       );
       return;
     }
 
-    const partidosAbiertos = partidos.filter((p) => !isClosed(p));
-
-    const rows = partidosAbiertos
-      .filter((match) => {
-        const prediction = predictions[match.id];
-        return prediction?.home !== "" && prediction?.away !== "";
-      })
-      .map((match) => ({
-        nombre: participant.nombre.trim(),
-        email: participant.email.trim().toLowerCase(),
-        whatsapp: participant.whatsapp.trim(),
-        pais: participant.pais.trim(),
-        partido_id: match.id,
-        equipo_local: match.localEs,
-        equipo_visitante: match.visitanteEs,
-        goles_local: Number(predictions[match.id].home),
-        goles_visitante: Number(predictions[match.id].away),
-        fase: "16avos de Final",
-        fecha: isSpanish ? match.fechaEs : match.fechaEn,
-        grupo: "16avos",
-        puntos: 0,
-      }));
-
-    if (rows.length === 0) {
+    if (isClosed(match)) {
       setMessage(
         isSpanish
-          ? "No hay pronósticos nuevos para guardar o los partidos ya están cerrados."
-          : "There are no new predictions to save or the matches are already closed."
+          ? `El partido ${match.id} ya está cerrado.`
+          : `Match ${match.id} is already closed.`
       );
       return;
     }
 
-    setSaving(true);
+    const prediction = predictions[match.id];
+
+    if (!prediction || prediction.home === "" || prediction.away === "") {
+      setMessage(
+        isSpanish
+          ? `Completa el marcador del partido ${match.id}.`
+          : `Please complete the score for match ${match.id}.`
+      );
+      return;
+    }
+
+    setSavingMatch(match.id);
+
+    const row = {
+      nombre: participant.nombre.trim(),
+      email: participant.email.trim().toLowerCase(),
+      whatsapp: participant.whatsapp.trim(),
+      pais: participant.pais.trim(),
+      partido_id: match.id,
+      equipo_local: match.localEs,
+      equipo_visitante: match.visitanteEs,
+      goles_local: Number(prediction.home),
+      goles_visitante: Number(prediction.away),
+      fase: "16avos de Final",
+      fecha: isSpanish ? match.fechaEs : match.fechaEn,
+      grupo: "16avos",
+      puntos: 0,
+    };
 
     const { error } = await supabase
       .from("pronosticos")
-      .upsert(rows, { onConflict: "email,partido_id" });
+      .upsert(row, { onConflict: "email,partido_id" });
 
-    setSaving(false);
+    setSavingMatch(null);
 
     if (error) {
       console.error(error);
       setMessage(
         isSpanish
-          ? "No se pudieron guardar los pronósticos. Revisa los datos e intenta nuevamente."
-          : "Predictions could not be saved. Please check your details and try again."
+          ? `No se pudo guardar el partido ${match.id}.`
+          : `Match ${match.id} could not be saved.`
       );
       return;
     }
 
+    setSavedMatches((prev) => ({
+      ...prev,
+      [match.id]: `${prediction.home} - ${prediction.away}`,
+    }));
+
     setMessage(
       isSpanish
-        ? "Pronósticos guardados correctamente."
-        : "Predictions saved successfully."
+        ? `✅ Partido ${match.id} guardado correctamente.`
+        : `✅ Match ${match.id} saved successfully.`
     );
   };
 
@@ -276,28 +270,31 @@ export default function DieciseisavosPronosticosPage() {
 
         <section className="text-center my-10">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
-            🏆 {isSpanish ? "Pronósticos 16avos de Final" : "Round of 32 Predictions"}
+            🏆{" "}
+            {isSpanish
+              ? "Pronósticos 16avos de Final"
+              : "Round of 32 Predictions"}
           </h1>
 
           <p className="text-slate-300 text-lg max-w-3xl mx-auto">
             {isSpanish
-              ? "Completa tus pronósticos para los cruces confirmados. Cada partido se cierra una hora antes de su inicio."
-              : "Submit your predictions for the confirmed matches. Each match closes one hour before kick-off."}
+              ? "Guarda cada partido por separado. Cada pronóstico se cierra una hora antes del inicio de su partido."
+              : "Save each match separately. Each prediction closes one hour before its match starts."}
           </p>
 
           <div className="mt-6 bg-yellow-500/10 border border-yellow-500 rounded-2xl p-5 max-w-3xl mx-auto">
             <p className="text-yellow-400 font-extrabold mb-2">
               ⏰{" "}
               {isSpanish
-                ? "Cada pronóstico se cierra una hora antes del inicio de su partido."
-                : "Each prediction closes one hour before its match starts."}
+                ? "Cierre individual: una hora antes de cada partido."
+                : "Individual deadline: one hour before each match."}
             </p>
 
             <p className="text-slate-200 font-bold">
               ⚠️{" "}
               {isSpanish
-                ? "Importante: el pronóstico considera solo el resultado al término del tiempo reglamentario. No se consideran alargue ni penales."
-                : "Important: predictions only count the result at the end of regular time. Extra time and penalties are not included."}
+                ? "Solo cuenta el resultado al término del tiempo reglamentario. No se consideran alargue ni penales."
+                : "Only the result at the end of regular time counts. Extra time and penalties are not included."}
             </p>
           </div>
         </section>
@@ -309,7 +306,7 @@ export default function DieciseisavosPronosticosPage() {
 
           <div className="grid md:grid-cols-2 gap-4">
             <input
-              className="p-4 rounded-xl text-black font-bold"
+              className="p-4 rounded-xl text-black font-bold bg-white"
               placeholder={isSpanish ? "Nombre completo" : "Full name"}
               value={participant.nombre}
               onChange={(e) =>
@@ -318,8 +315,12 @@ export default function DieciseisavosPronosticosPage() {
             />
 
             <input
-              className="p-4 rounded-xl text-black font-bold"
-              placeholder={isSpanish ? "Correo usado en la inscripción" : "Email used during registration"}
+              className="p-4 rounded-xl text-black font-bold bg-white"
+              placeholder={
+                isSpanish
+                  ? "Correo usado en la inscripción"
+                  : "Email used during registration"
+              }
               value={participant.email}
               onChange={(e) =>
                 setParticipant({ ...participant, email: e.target.value })
@@ -327,7 +328,7 @@ export default function DieciseisavosPronosticosPage() {
             />
 
             <input
-              className="p-4 rounded-xl text-black font-bold"
+              className="p-4 rounded-xl text-black font-bold bg-white"
               placeholder="WhatsApp"
               value={participant.whatsapp}
               onChange={(e) =>
@@ -336,7 +337,7 @@ export default function DieciseisavosPronosticosPage() {
             />
 
             <input
-              className="p-4 rounded-xl text-black font-bold"
+              className="p-4 rounded-xl text-black font-bold bg-white"
               placeholder={isSpanish ? "País" : "Country"}
               value={participant.pais}
               onChange={(e) =>
@@ -347,12 +348,14 @@ export default function DieciseisavosPronosticosPage() {
         </section>
 
         <section className="grid md:grid-cols-2 gap-6">
-          {partidos.map((partido) => {
-            const closed = isClosed(partido);
+          {partidos.map((match) => {
+            const closed = isClosed(match);
+            const home = predictions[match.id]?.home ?? "";
+            const away = predictions[match.id]?.away ?? "";
 
             return (
               <div
-                key={partido.id}
+                key={match.id}
                 className={`rounded-2xl p-6 border ${
                   closed
                     ? "bg-slate-900 border-red-500/50 opacity-70"
@@ -361,7 +364,7 @@ export default function DieciseisavosPronosticosPage() {
               >
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-yellow-400 font-extrabold">
-                    {isSpanish ? "Partido" : "Match"} {partido.id}
+                    {isSpanish ? "Partido" : "Match"} {match.id}
                   </h2>
 
                   <span
@@ -380,52 +383,52 @@ export default function DieciseisavosPronosticosPage() {
                 </div>
 
                 <p className="text-slate-300 mb-1">
-                  📅 {isSpanish ? partido.fechaEs : partido.fechaEn}
+                  📅 {isSpanish ? match.fechaEs : match.fechaEn}
                 </p>
 
                 <p className="text-slate-300 mb-1">
-                  🕒 {isSpanish ? partido.horaChile : partido.horaIrlanda}
+                  🕒 {isSpanish ? match.horaChile : match.horaIrlanda}
                 </p>
 
                 <p className="text-yellow-400 font-bold mb-5">
                   ⏰ {isSpanish ? "Cierre" : "Closes"}:{" "}
-                  {isSpanish ? partido.cierreChile : partido.horaIrlanda}
+                  {isSpanish ? match.cierreChile : match.cierreIrlanda}
                 </p>
 
                 <div className="bg-slate-900 rounded-xl p-5">
-                  <div className="grid grid-cols-[1fr_90px_1fr] items-center gap-3">
-                    <div className="text-right font-bold">
-                      <span className="mr-2">{partido.banderaLocal}</span>
-                      {teamName(partido, "local")}
+                  <div className="grid grid-cols-1 md:grid-cols-[1fr_170px_1fr] items-center gap-4">
+                    <div className="text-center md:text-right font-bold text-lg">
+                      <span className="mr-2">{match.banderaLocal}</span>
+                      {isSpanish ? match.localEs : match.localEn}
                     </div>
 
-                    <div className="flex gap-2 justify-center">
+                    <div className="flex items-center justify-center gap-3">
                       <input
                         type="number"
                         min="0"
                         disabled={closed}
-                        className="w-12 p-2 rounded-lg text-black text-center font-bold"
-                        value={predictions[partido.id]?.home ?? ""}
+                        className="w-16 h-16 rounded-xl bg-white text-black text-center text-3xl font-extrabold disabled:opacity-50"
+                        value={home}
                         onChange={(e) =>
                           handlePredictionChange(
-                            partido.id,
+                            match.id,
                             "home",
                             e.target.value
                           )
                         }
                       />
 
-                      <span className="font-bold pt-2">-</span>
+                      <span className="text-3xl font-extrabold">-</span>
 
                       <input
                         type="number"
                         min="0"
                         disabled={closed}
-                        className="w-12 p-2 rounded-lg text-black text-center font-bold"
-                        value={predictions[partido.id]?.away ?? ""}
+                        className="w-16 h-16 rounded-xl bg-white text-black text-center text-3xl font-extrabold disabled:opacity-50"
+                        value={away}
                         onChange={(e) =>
                           handlePredictionChange(
-                            partido.id,
+                            match.id,
                             "away",
                             e.target.value
                           )
@@ -433,11 +436,32 @@ export default function DieciseisavosPronosticosPage() {
                       />
                     </div>
 
-                    <div className="font-bold">
-                      <span className="mr-2">{partido.banderaVisitante}</span>
-                      {teamName(partido, "visitante")}
+                    <div className="text-center md:text-left font-bold text-lg">
+                      <span className="mr-2">{match.banderaVisitante}</span>
+                      {isSpanish ? match.visitanteEs : match.visitanteEn}
                     </div>
                   </div>
+
+                  {savedMatches[match.id] && (
+                    <p className="mt-4 text-green-400 font-bold text-center">
+                      ✅ {isSpanish ? "Guardado" : "Saved"}:{" "}
+                      {savedMatches[match.id]}
+                    </p>
+                  )}
+
+                  <button
+                    onClick={() => saveMatch(match)}
+                    disabled={closed || savingMatch === match.id}
+                    className="mt-5 w-full bg-green-500 text-black font-extrabold py-4 rounded-xl hover:bg-green-400 transition disabled:opacity-50"
+                  >
+                    {savingMatch === match.id
+                      ? isSpanish
+                        ? "Guardando..."
+                        : "Saving..."
+                      : isSpanish
+                      ? `Guardar partido ${match.id}`
+                      : `Save match ${match.id}`}
+                  </button>
                 </div>
               </div>
             );
@@ -449,20 +473,6 @@ export default function DieciseisavosPronosticosPage() {
             {message}
           </div>
         )}
-
-        <button
-          onClick={handleSubmit}
-          disabled={saving}
-          className="mt-8 w-full bg-yellow-400 text-black font-extrabold py-5 rounded-xl hover:bg-yellow-300 text-xl transition disabled:opacity-60"
-        >
-          {saving
-            ? isSpanish
-              ? "Guardando..."
-              : "Saving..."
-            : isSpanish
-            ? "Guardar pronósticos"
-            : "Save predictions"}
-        </button>
       </div>
     </main>
   );
