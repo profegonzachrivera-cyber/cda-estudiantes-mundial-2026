@@ -172,7 +172,7 @@ const partidos: Partido[] = [
       equipo_visitante: match.visitanteEs,
       goles_local: Number(prediction.home),
       goles_visitante: Number(prediction.away),
-      fase: "8avos de Final",
+      fase: "4tos de Final",
       fecha: isSpanish ? match.fechaEs : match.fechaEn,
       grupo: "16avos",
       puntos: 0,
@@ -239,7 +239,7 @@ const partidos: Partido[] = [
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
             🏆{" "}
             {isSpanish
-              ? "Pronósticos 8avos de Final"
+              ? "Pronósticos 4tos de Final"
               : "Round of 32 Predictions"}
           </h1>
 
