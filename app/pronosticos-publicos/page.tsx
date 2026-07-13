@@ -62,13 +62,19 @@ export default function PronosticosPublicosPage() {
     setSelectedEmail(email);
     setSelectedParticipante(participantes.find((p) => p.email === email) || null);
 
-    const { data } = await supabase
-      supabase.rpc("obtener_pronosticos_publicos")
-      .eq("email", email)
-      .order("partido_id", { ascending: true });
+    const { data, error } = await (supabase as any)
+  .rpc("obtener_pronosticos_publicos")
+  .eq("email", email)
+  .order("partido_id", { ascending: true });
 
-    setPronosticos((data || []) as Pronostico[]);
-  };
+if (error) {
+  console.error("Error cargando pronósticos públicos:", error);
+  setPronosticos([]);
+  return;
+}
+
+setPronosticos((data || []) as Pronostico[]);
+};
 
   const obtenerResultado = (partidoId: number) =>
     resultados.find((r) => Number(r.partido_id) === Number(partidoId));
