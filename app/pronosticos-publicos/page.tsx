@@ -63,8 +63,7 @@ export default function PronosticosPublicosPage() {
     setSelectedParticipante(participantes.find((p) => p.email === email) || null);
 
     const { data } = await supabase
-      .from("pronosticos")
-      .select("*")
+      supabase.rpc("obtener_pronosticos_publicos")
       .eq("email", email)
       .order("partido_id", { ascending: true });
 
