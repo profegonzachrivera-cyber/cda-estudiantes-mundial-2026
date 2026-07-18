@@ -41,38 +41,38 @@ export default function DieciseisavosPronosticosPage() {
 
 const partidos: Partido[] = [
   {
-    id: 101,
-    fechaEs: "Martes 14 julio",
-    fechaEn: "Tuesday, July 14",
-    horaChile: "15:00 hrs Chile",
-    horaIrlanda: "20:00 hrs Ireland",
-    cierreChile: "14:00 hrs Chile",
-    cierreIrlanda: "19:00 hrs Ireland",
-    cierreDate: "2026-07-14T14:00:00-04:00",
+    id: 103,
+    fechaEs: "Sábado 18 julio",
+    fechaEn: "Saturday, July 18",
+    horaChile: "17:00 hrs Chile",
+    horaIrlanda: "22:00 hrs Ireland",
+    cierreChile: "16:00 hrs Chile",
+    cierreIrlanda: "21:00 hrs Ireland",
+    cierreDate: "2026-07-18T16:00:00-04:00",
     localEs: "Francia",
     localEn: "France",
-    visitanteEs: "España",
-    visitanteEn: "Spain",
-    banderaLocal: "FR",
-    banderaVisitante: "ES",
+    visitanteEs: "Inglaterra",
+    visitanteEn: "England",
+    banderaLocal: "🇫🇷",
+    banderaVisitante: "🏴",
   },
   {
-    id: 102,
-    fechaEs: "Miércoles 15 julio",
-    fechaEn: "Wednesday, July 15",
+    id: 104,
+    fechaEs: "Domingo 19 julio",
+    fechaEn: "Sunday, July 19",
     horaChile: "15:00 hrs Chile",
     horaIrlanda: "20:00 hrs Ireland",
     cierreChile: "14:00 hrs Chile",
     cierreIrlanda: "19:00 hrs Ireland",
-    cierreDate: "2026-07-15T14:00:00-04:00",
-    localEs: "Inglaterra",
-    localEn: "England",
+    cierreDate: "2026-07-19T14:00:00-04:00",
+    localEs: "España",
+    localEn: "Spain",
     visitanteEs: "Argentina",
     visitanteEn: "Argentina",
-    banderaLocal: "EN",
-    banderaVisitante: "AR",
+    banderaLocal: "🇪🇸",
+    banderaVisitante: "🇦🇷",
   },
-];  
+];
 
 const isClosed = (partido: Partido) =>
     new Date() >= new Date(partido.cierreDate);
@@ -141,7 +141,7 @@ const isClosed = (partido: Partido) =>
       equipo_visitante: match.visitanteEs,
       goles_local: Number(prediction.home),
       goles_visitante: Number(prediction.away),
-      fase: "Semifinales",
+      fase: "Tercer Lugar y Final",
       fecha: isSpanish ? match.fechaEs : match.fechaEn,
       grupo: "16avos",
       puntos: 0,
@@ -208,7 +208,7 @@ const isClosed = (partido: Partido) =>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
             🏆{" "}
             {isSpanish
-              ? "Pronósticos Semifinales"
+              ? "Pronósticos Tercer Lugar y Final "
               : "Round of 32 Predictions"}
           </h1>
 
