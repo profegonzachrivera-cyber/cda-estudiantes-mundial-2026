@@ -39,28 +39,41 @@ export default function DieciseisavosPronosticosPage() {
 
   const isSpanish = language === "es";
 
-const partidos = [
+const partidos: Partido[] = [
   {
-    id: 103,
-    equipo_local: "Francia",
-    equipo_visitante: "Inglaterra",
-    bandera_local: "🇫🇷",
-    bandera_visitante: "🏴",
-    fecha: "Sábado 18 de julio",
-    hora_chile: "17:00",
-    fase: "Tercer lugar",
+    id: 101,
+    fechaEs: "Martes 14 julio",
+    fechaEn: "Tuesday, July 14",
+    horaChile: "15:00 hrs Chile",
+    horaIrlanda: "20:00 hrs Ireland",
+    cierreChile: "14:00 hrs Chile",
+    cierreIrlanda: "19:00 hrs Ireland",
+    cierreDate: "2026-07-14T14:00:00-04:00",
+    localEs: "Francia",
+    localEn: "France",
+    visitanteEs: "España",
+    visitanteEn: "Spain",
+    banderaLocal: "FR",
+    banderaVisitante: "ES",
   },
   {
-    id: 104,
-    equipo_local: "España",
-    equipo_visitante: "Argentina",
-    bandera_local: "🇪🇸",
-    bandera_visitante: "🇦🇷",
-    fecha: "Domingo 19 de julio",
-    hora_chile: "15:00",
-    fase: "Final",
+    id: 102,
+    fechaEs: "Miércoles 15 julio",
+    fechaEn: "Wednesday, July 15",
+    horaChile: "15:00 hrs Chile",
+    horaIrlanda: "20:00 hrs Ireland",
+    cierreChile: "14:00 hrs Chile",
+    cierreIrlanda: "19:00 hrs Ireland",
+    cierreDate: "2026-07-15T14:00:00-04:00",
+    localEs: "Inglaterra",
+    localEn: "England",
+    visitanteEs: "Argentina",
+    visitanteEn: "Argentina",
+    banderaLocal: "EN",
+    banderaVisitante: "AR",
   },
-];
+];  
+
 const isClosed = (partido: Partido) =>
     new Date() >= new Date(partido.cierreDate);
 
@@ -128,7 +141,7 @@ const isClosed = (partido: Partido) =>
       equipo_visitante: match.visitanteEs,
       goles_local: Number(prediction.home),
       goles_visitante: Number(prediction.away),
-      fase: "Tercer lugar y Final",
+      fase: "Semifinales",
       fecha: isSpanish ? match.fechaEs : match.fechaEn,
       grupo: "16avos",
       puntos: 0,
@@ -195,7 +208,7 @@ const isClosed = (partido: Partido) =>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
             🏆{" "}
             {isSpanish
-              ? "Pronósticos Tercer lugar y Final"
+              ? "Pronósticos Semifinales"
               : "Round of 32 Predictions"}
           </h1>
 
